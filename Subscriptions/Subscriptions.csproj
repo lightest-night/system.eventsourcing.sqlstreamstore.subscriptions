@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <AssemblyName>LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions</AssemblyName>
+        <RootNamespace>LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LightestNight.System.EventSourcing.SqlStreamStore" Version="3.4.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.8" />
+    </ItemGroup>
+
+</Project>

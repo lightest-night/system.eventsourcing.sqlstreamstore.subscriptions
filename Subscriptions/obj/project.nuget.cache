@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "dgSpecHash": "RcF1pSLmIz86DGh3WhoquRb39iCGXNlog0/dgIdGkcVER111zdoO8G9sefOamTBw9zhOIv/5w4iRigYSmFV2Rw==",
+  "success": true,
+  "projectFilePath": "D:\\Lightest Night\\System\\EventSourcing\\SqlStreamStore\\Subscriptions\\Subscriptions\\Subscriptions.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\James Woodley\\.nuget\\packages\\lightestnight.system.eventsourcing\\3.4.0\\lightestnight.system.eventsourcing.3.4.0.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\lightestnight.system.eventsourcing.sqlstreamstore\\3.4.0\\lightestnight.system.eventsourcing.sqlstreamstore.3.4.0.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\lightestnight.system.serviceresolution\\1.1.2\\lightestnight.system.serviceresolution.1.1.2.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\lightestnight.system.utilities\\1.8.5\\lightestnight.system.utilities.1.8.5.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\1.1.1\\microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\3.1.8\\microsoft.extensions.configuration.abstractions.3.1.8.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\3.1.7\\microsoft.extensions.dependencyinjection.3.1.7.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\3.1.8\\microsoft.extensions.dependencyinjection.abstractions.3.1.8.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\3.1.8\\microsoft.extensions.fileproviders.abstractions.3.1.8.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\3.1.8\\microsoft.extensions.hosting.abstractions.3.1.8.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\3.1.8\\microsoft.extensions.logging.abstractions.3.1.8.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.options\\3.1.7\\microsoft.extensions.options.3.1.7.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\microsoft.extensions.primitives\\3.1.8\\microsoft.extensions.primitives.3.1.8.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\sqlstreamstore\\1.2.0\\sqlstreamstore.1.2.0.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\system.buffers\\4.4.0\\system.buffers.4.4.0.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\system.componentmodel.annotations\\4.7.0\\system.componentmodel.annotations.4.7.0.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\system.memory\\4.5.2\\system.memory.4.5.2.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\system.numerics.vectors\\4.4.0\\system.numerics.vectors.4.4.0.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.7.1\\system.runtime.compilerservices.unsafe.4.7.1.nupkg.sha512",
+    "C:\\Users\\James Woodley\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
+  ],
+  "logs": []
+}
