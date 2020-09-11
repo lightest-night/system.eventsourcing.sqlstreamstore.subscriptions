@@ -6,6 +6,24 @@
         <RootNamespace>LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions</RootNamespace>
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions</PackageId>
+        <Authors>James Woodley</Authors>
+        <Company>LightestNight Ltd</Company>
+        <Title>LightestNight :: System :: Event Sourcing :: Sql Stream Store :: Subscriptions</Title>
+        <Description>The core elements to enable Event Sourcing subscriptions using the Sql Stream Store framework. Allows automatic subscriptions to be created assisting in the building of eventually consistent read models.</Description>
+        <PackageTags>lightestnight;system;infrastructure;event;event sourcing;domain driven design;cqrs;sql stream store;subscriptions</PackageTags>
+        <Version>1.0.0</Version>
+        <PackageVersion>1.0.0</PackageVersion>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <InformationalVersion>1.0.0</InformationalVersion>
+        <PackageIcon>icon.jpeg</PackageIcon>
+        <RepositoryUrl>https://github.com/lightestnight/system.eventsourcing.sqlstreamstore.subscriptions</RepositoryUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -19,6 +37,20 @@
     <ItemGroup>
       <PackageReference Include="LightestNight.System.EventSourcing.SqlStreamStore" Version="3.4.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\icon.jpeg">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\LICENSE">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
 </Project>

@@ -5,6 +5,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B8F340AD-94E2-43C9-8472-69A3D70C564A}"
 ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
+	GitVersion.yml = GitVersion.yml
+	LICENSE = LICENSE
+	README.md = README.md
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{8A40982A-6A78-49C9-8EBB-81CE0D4D2821}"
+ProjectSection(SolutionItems) = preProject
+	.github\workflows\CI.yml = .github\workflows\CI.yml
+	.github\workflows\Release.yml = .github\workflows\Release.yml
 EndProjectSection
 EndProject
 Global
