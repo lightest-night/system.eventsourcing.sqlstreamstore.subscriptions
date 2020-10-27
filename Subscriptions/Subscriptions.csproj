@@ -35,8 +35,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="LightestNight.System.EventSourcing.SqlStreamStore" Version="3.6.0" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.8" />
+      <PackageReference Include="LightestNight.System.EventSourcing.SqlStreamStore" Version="3.7.0-alpha0002" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.9" />
     </ItemGroup>
 
     <ItemGroup>

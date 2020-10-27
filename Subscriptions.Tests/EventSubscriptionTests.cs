@@ -32,7 +32,12 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
                 _waitEvent.Set();
             });
 
-            _sut = new EventSubscription(new NullLogger<EventSubscription>(), _streamStore,
+            var streamStoreFactoryMock = new Mock<IStreamStoreFactory>();
+            streamStoreFactoryMock
+                .Setup(streamStoreFactory => streamStoreFactory.GetStreamStore(3, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_streamStore);
+
+            _sut = new EventSubscription(new NullLogger<EventSubscription>(), streamStoreFactoryMock.Object,
                 Mock.Of<SetGlobalCheckpoint>(), Mock.Of<GetGlobalCheckpoint>());
         }
 

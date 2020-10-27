@@ -18,15 +18,15 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
         private static int _failureCount;
 
         private readonly ILogger<EventSubscription> _logger;
-        private readonly IStreamStore _streamStore;
+        private readonly IStreamStoreFactory _streamStoreFactory;
         private readonly GetGlobalCheckpoint _getGlobalCheckpoint;
         private readonly SetGlobalCheckpoint _setGlobalCheckpoint;
 
-        public EventSubscription(ILogger<EventSubscription> logger, IStreamStore streamStore,
+        public EventSubscription(ILogger<EventSubscription> logger, IStreamStoreFactory streamStoreFactory,
             SetGlobalCheckpoint setGlobalCheckpoint, GetGlobalCheckpoint getGlobalCheckpoint)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _streamStore = streamStore ?? throw new ArgumentNullException(nameof(streamStore));
+            _streamStoreFactory = streamStoreFactory ?? throw new ArgumentNullException(nameof(streamStoreFactory));
             _setGlobalCheckpoint = setGlobalCheckpoint ?? throw new ArgumentNullException(nameof(setGlobalCheckpoint));
             _getGlobalCheckpoint = getGlobalCheckpoint ?? throw new ArgumentNullException(nameof(getGlobalCheckpoint));
         }
@@ -63,10 +63,13 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
 
         private async Task SetSubscription(CancellationToken cancellationToken = default)
         {
+            var streamStoreTask = _streamStoreFactory.GetStreamStore(cancellationToken: cancellationToken);
             var checkpoint = await _getGlobalCheckpoint(cancellationToken).ConfigureAwait(false);
 
             _subscription?.Dispose();
-            _subscription = _streamStore.SubscribeToAll(checkpoint, StreamMessageReceived, SubscriptionDropped);
+
+            var streamStore = await streamStoreTask.ConfigureAwait(false); 
+            _subscription = streamStore.SubscribeToAll(checkpoint, StreamMessageReceived, SubscriptionDropped);
             _logger.LogInformation($"The {Constants.GlobalCheckpointId} subscription has been created");
         }
 
@@ -96,6 +99,7 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
         private void SubscriptionDropped(IAllStreamSubscription subscription, SubscriptionDroppedReason reason,
             Exception exception)
         {
+            var streamStoreTask = _streamStoreFactory.GetStreamStore();
             _subscription?.Dispose();
 
             _failureCount++;
@@ -107,7 +111,9 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
             {
                 _logger.LogError(exception,
                     $"Event Subscription dropped. Reason: {reason}. Failure #{_failureCount}. Attempting to reconnect...");
-                _subscription = _streamStore.SubscribeToAll(subscription.LastPosition, StreamMessageReceived,
+
+                var streamStore = streamStoreTask.Result;
+                _subscription = streamStore.SubscribeToAll(subscription.LastPosition, StreamMessageReceived,
                     SubscriptionDropped);
             }
         }
