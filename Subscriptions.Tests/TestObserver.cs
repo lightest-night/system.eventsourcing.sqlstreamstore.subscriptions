@@ -19,7 +19,7 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
         public Task InitialiseObserver(CancellationToken cancellationToken = new CancellationToken())
             => Task.CompletedTask;
 
-        public Task EventReceived(object evt, long? position = null, int? version = null, CancellationToken cancellationToken = default)
+        public Task EventReceived(EventSourceEvent evt, long? position = null, int? version = null, CancellationToken cancellationToken = default)
         {
             _outcome(evt);
             return Task.CompletedTask;
