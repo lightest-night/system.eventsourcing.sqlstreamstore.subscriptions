@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using LightestNight.System.EventSourcing.Checkpoints;
@@ -24,6 +25,8 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
 
         public EventSubscriptionTests()
         {
+            EventCollection.AddAssemblyTypes(Assembly.GetExecutingAssembly());
+            
             _streamStore = new InMemoryStreamStore();
 
             _observer = new TestObserver(true, false, @event =>
