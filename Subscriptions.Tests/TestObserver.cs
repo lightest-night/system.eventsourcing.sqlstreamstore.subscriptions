@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using LightestNight.System.EventSourcing.Events;
+using LightestNight.System.EventSourcing.Observers;
 
 namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
 {
@@ -19,7 +20,7 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
         public Task InitialiseObserver(CancellationToken cancellationToken = new CancellationToken())
             => Task.CompletedTask;
 
-        public Task EventReceived(EventSourceEvent evt, long? position = null, int? version = null, CancellationToken cancellationToken = default)
+        public Task EventReceived(EventSourceEvent evt, CancellationToken cancellationToken = default)
         {
             _outcome(evt);
             return Task.CompletedTask;

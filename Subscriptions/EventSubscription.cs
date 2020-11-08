@@ -89,8 +89,7 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
 
             var eventSourceEvent = await message.ToEvent(cancellationToken).ConfigureAwait(false);
             await Task.WhenAll(eventObservers.Select(observer =>
-                    observer.EventReceived(eventSourceEvent, message.Position, message.StreamVersion,
-                        cancellationToken)))
+                    observer.EventReceived(eventSourceEvent, cancellationToken)))
                 .ConfigureAwait(false);
 
             await _setGlobalCheckpoint(subscription.LastPosition, cancellationToken).ConfigureAwait(false);
