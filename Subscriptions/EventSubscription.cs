@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,62 +16,65 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
     public class EventSubscription : BackgroundService
     {
         private static IAllStreamSubscription? _subscription;
+
         private static int _failureCount;
 
+        private readonly IEventObserver[] _eventObservers;
+
         private readonly ILogger<EventSubscription> _logger;
+
         private readonly IStreamStoreFactory _streamStoreFactory;
+
         private readonly GetGlobalCheckpoint _getGlobalCheckpoint;
+
         private readonly SetGlobalCheckpoint _setGlobalCheckpoint;
 
-        public EventSubscription(ILogger<EventSubscription> logger, IStreamStoreFactory streamStoreFactory,
-            SetGlobalCheckpoint setGlobalCheckpoint, GetGlobalCheckpoint getGlobalCheckpoint)
+        public EventSubscription(IEnumerable<IEventObserver> eventObservers, ILogger<EventSubscription> logger,
+            IStreamStoreFactory streamStoreFactory, SetGlobalCheckpoint setGlobalCheckpoint,
+            GetGlobalCheckpoint getGlobalCheckpoint)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _streamStoreFactory = streamStoreFactory ?? throw new ArgumentNullException(nameof(streamStoreFactory));
-            _setGlobalCheckpoint = setGlobalCheckpoint ?? throw new ArgumentNullException(nameof(setGlobalCheckpoint));
-            _getGlobalCheckpoint = getGlobalCheckpoint ?? throw new ArgumentNullException(nameof(getGlobalCheckpoint));
+            _eventObservers = eventObservers.ToArray();
+            _logger = logger;
+            _streamStoreFactory = streamStoreFactory;
+            _setGlobalCheckpoint = setGlobalCheckpoint;
+            _getGlobalCheckpoint = getGlobalCheckpoint;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"{nameof(EventSubscription)} is starting...");
-            stoppingToken.Register(() => _logger.LogInformation($"{nameof(EventSubscription)} is stopping..."));
+            _logger.LogInformation("Initialising {observerCount} observers", _eventObservers.Length);
+            await Task.WhenAll(_eventObservers.Select(observer => observer.InitialiseObserver(stoppingToken)))
+                .ConfigureAwait(false);
 
-            if (!ObserverCollection.GetEventObservers().Any())
-                // There are no observers currently registered in the system, save resources and do not set up a subscription yet
-                _logger.LogDebug("No event observers registered at subscription initialisation time");
-            else
-                await SetSubscription(stoppingToken).ConfigureAwait(false);
+            _logger.LogInformation("{subscriptionName} is starting...", nameof(EventSubscription));
+            stoppingToken.Register(() =>
+                _logger.LogInformation("{subscriptionName} is stopping...", nameof(EventSubscription)));
 
-            ObserverCollection.EventObserverRegistered += async args =>
-            {
-                await SetSubscription(stoppingToken).ConfigureAwait(false);
-            };
-
-            ObserverCollection.EventObserverUnregistered += async args =>
-            {
-                await SetSubscription(stoppingToken).ConfigureAwait(false);
-            };
+            await SetSubscription(cancellationToken: stoppingToken).ConfigureAwait(false);
         }
 
         public override void Dispose()
         {
             _subscription?.Dispose();
             GC.SuppressFinalize(this);
-            
+
             base.Dispose();
         }
 
-        private async Task SetSubscription(CancellationToken cancellationToken = default)
+        private async Task SetSubscription(long? checkpoint = default, CancellationToken cancellationToken = default)
         {
             var streamStoreTask = _streamStoreFactory.GetStreamStore(cancellationToken: cancellationToken);
-            var checkpoint = await _getGlobalCheckpoint(cancellationToken).ConfigureAwait(false);
+            var checkpointTask = checkpoint == default
+                ? _getGlobalCheckpoint(cancellationToken)
+                : Task.FromResult(checkpoint);
 
             _subscription?.Dispose();
 
-            var streamStore = await streamStoreTask.ConfigureAwait(false); 
-            _subscription = streamStore.SubscribeToAll(checkpoint, StreamMessageReceived, SubscriptionDropped);
-            _logger.LogInformation($"The {Constants.GlobalCheckpointId} subscription has been created");
+            var streamStore = await streamStoreTask.ConfigureAwait(false);
+            _subscription = streamStore.SubscribeToAll(await checkpointTask.ConfigureAwait(false),
+                StreamMessageReceived, SubscriptionDropped);
+
+            _logger.LogInformation("The global subscription has been created");
         }
 
         private async Task StreamMessageReceived(IAllStreamSubscription subscription, StreamMessage message,
@@ -79,18 +83,16 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
             if (message.IsInSystemStream())
             {
                 _logger.LogInformation(
-                    $"Event {message.Type} is in a System stream therefore not being sent to observers");
+                    "Event {messageType} is in a System stream therefore not being sent to observers", message.Type);
                 return;
             }
 
-            var eventObservers = ObserverCollection.GetEventObservers().ToArray();
-            _logger.LogInformation(
-                $"Event {message.Type} received, sending to {eventObservers.Length} observer{(eventObservers.Length > 1 ? "s" : string.Empty)}");
+            _logger.LogDebug("Event {eventType} received with ID {messageId}, sending to {observerLength} observers",
+                message.Type, message.MessageId, _eventObservers.Length);
 
             var eventSourceEvent = await message.ToEvent(cancellationToken).ConfigureAwait(false);
-            await Task.WhenAll(eventObservers.Select(observer =>
-                    observer.EventReceived(eventSourceEvent, cancellationToken)))
-                .ConfigureAwait(false);
+            await Task.WhenAll(_eventObservers.Select(observer =>
+                observer.EventReceived(eventSourceEvent, cancellationToken))).ConfigureAwait(false);
 
             await _setGlobalCheckpoint(subscription.LastPosition, cancellationToken).ConfigureAwait(false);
         }
@@ -98,22 +100,19 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions
         private void SubscriptionDropped(IAllStreamSubscription subscription, SubscriptionDroppedReason reason,
             Exception exception)
         {
-            var streamStoreTask = _streamStoreFactory.GetStreamStore();
-            _subscription?.Dispose();
-
             _failureCount++;
             if (_failureCount >= 5)
             {
-                _logger.LogCritical(exception, $"Event Subscription dropped. Reason: {reason}");
+                _logger.LogCritical(exception, "Event Subscription dropped. Reason: {reason}. Failure #{failureCount}.",
+                    reason, _failureCount);
             }
             else
             {
                 _logger.LogError(exception,
-                    $"Event Subscription dropped. Reason: {reason}. Failure #{_failureCount}. Attempting to reconnect...");
+                    "Event Subscription dropped. Reason: {reason}. Failure #{failureCount}. Attempting to reconnect...",
+                    reason, _failureCount);
 
-                var streamStore = streamStoreTask.Result;
-                _subscription = streamStore.SubscribeToAll(subscription.LastPosition, StreamMessageReceived,
-                    SubscriptionDropped);
+                SetSubscription(subscription.LastPosition).Wait();
             }
         }
     }

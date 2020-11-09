@@ -18,8 +18,7 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
     {
         private readonly IStreamStore _streamStore;
         private readonly EventSubscription _sut;
-        private readonly IEventObserver _observer;
-        
+
         private object? _observedEvent;
         private readonly ManualResetEventSlim _waitEvent = new ManualResetEventSlim(false);
 
@@ -29,7 +28,7 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
             
             _streamStore = new InMemoryStreamStore();
 
-            _observer = new TestObserver(true, false, @event =>
+            IEventObserver observer = new TestObserver(true, false, @event =>
             {
                 _observedEvent = @event;
                 _waitEvent.Set();
@@ -40,12 +39,11 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
                 .Setup(streamStoreFactory => streamStoreFactory.GetStreamStore(3, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_streamStore);
 
-            _sut = new EventSubscription(new NullLogger<EventSubscription>(), streamStoreFactoryMock.Object,
-                Mock.Of<SetGlobalCheckpoint>(), Mock.Of<GetGlobalCheckpoint>());
+            _sut = new EventSubscription(new[] {observer}, NullLogger<EventSubscription>.Instance,
+                streamStoreFactoryMock.Object, Mock.Of<SetGlobalCheckpoint>(), Mock.Of<GetGlobalCheckpoint>());
         }
 
-        public Task InitializeAsync()
-            => ObserverCollection.RegisterObserverAsync(_observer, CancellationToken.None);
+        public Task InitializeAsync() => Task.CompletedTask;
 
         [Fact]
         public async Task ShouldDeliverCorrectEvent()
@@ -66,8 +64,8 @@ namespace LightestNight.System.EventSourcing.SqlStreamStore.Subscriptions.Tests
             // Assert
             var observedEvent = _observedEvent as TestEvent;
             observedEvent.ShouldNotBeNull();
-            observedEvent?.Id.ShouldBe(evt.Id);
-            observedEvent?.Property.ShouldBe(evt.Property);
+            observedEvent.Id.ShouldBe(evt.Id);
+            observedEvent.Property.ShouldBe(evt.Property);
         }
 
         public void Dispose()
